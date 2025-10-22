@@ -1,0 +1,49 @@
+<odoo>
+    <template id="login_template" name="CBOQ Login">
+        <t t-call="web.basic_layout">
+            <t t-set="css_files" t-value="['/BOQ/static/src/css/login.css']" />
+            <t t-foreach="css_files" t-as="css">
+                <link t-att-href="css" rel="stylesheet" />
+        </t>
+        <div class="boq-login-container">
+            <h2>✦ 𝕮𝕭𝕺𝖰 | Sɪɢɴ Iɴ ✦</h2>
+            <form method="post" action="/cboq/login">
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
+                <input type="text" name="username" placeholder="Username" required="required" />
+                <input type="password" name="password" placeholder="Password"
+                    required="required" />
+
+                <button type="submit">Sɪɢɴ Iɴ</button>
+                <p t-if="error" class="login-error">
+                    <t t-esc="error" />
+                </p>
+            </form>
+            <a href="/">Back to Home</a>
+        </div>
+        </t>
+    </template>
+    <template id="sboq_login_template" name="SBOQ Login">
+        <t t-call="web.basic_layout">
+            <t t-set="css_files" t-value="['/BOQ/static/src/css/login.css']" />
+            <t t-foreach="css_files" t-as="css">
+                <link t-att-href="css" rel="stylesheet" />
+        </t>
+        <div class="boq-login-container">
+            <h2>✦ 𝓢𝓑𝓞𝓠 | Sɪɢɴ Iɴ ✦</h2>
+            <form method="post" action="/sboq/login">
+                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
+                <input type="text" name="username" placeholder="Username" required="required" />
+                <input type="password" name="password" placeholder="Password"
+                    required="required" />
+
+                <button type="submit">Sɪɢɴ Iɴ</button>
+
+                <p t-if="error" class="login-error">
+                    <t t-esc="error" />
+                </p>
+            </form>
+            <a href="/">Back to Home</a>
+        </div>
+        </t>
+    </template>
+</odoo>

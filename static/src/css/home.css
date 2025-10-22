@@ -1,0 +1,94 @@
+#boq-home-section {
+  position: relative;
+  text-align: center;
+  color: white;
+  overflow: hidden;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+#boq-home-section .overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+#boq-home-section .boq-container {
+  position: relative;
+  z-index: 2;
+  padding: 40px;
+}
+
+.boq-title {
+  font-size: 3rem;
+  font-weight: 700;
+  margin-bottom: 20px;
+  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.8);
+}
+
+.boq-subtitle {
+  font-size: 1.3rem;
+  color: #e0e0e0;
+  margin-bottom: 50px;
+}
+
+.boq-button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+}
+
+@media (min-width: 768px) {
+  .boq-button-group {
+    flex-direction: row;
+    justify-content: center;
+  }
+}
+
+.boq-btn {
+  display: inline-block;
+  padding: 15px 40px;
+  border-radius: 30px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: white;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+}
+
+.boq-btn.cboq {
+  background-color: #007bff;
+}
+
+.boq-btn.cboq:hover {
+  background-color: #0062cc;
+  transform: scale(1.05);
+}
+
+.boq-btn.sboq {
+  background-color: #28a745;
+}
+
+.boq-btn.sboq:hover {
+  background-color: #1e7e34;
+  transform: scale(1.05);
+}
+
+.boq-btn.admin {
+  background-color: #343a40;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.boq-btn.admin:hover {
+  background-color: #23272b;
+  /* transform: scale(1.05); */
+  cursor: not-allowed;       /* keep cross cursor on hover */
+  transform: none;  
+}

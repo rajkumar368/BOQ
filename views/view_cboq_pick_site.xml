@@ -1,0 +1,69 @@
+<odoo>
+    <template id="site_config_template" name="Site Config Selector">
+        <html>
+            <head>
+                <title>Site &amp; Configuration Selector</title>
+                <meta charset="utf-8"/>
+                <meta name="viewport" content="width=device-width, initial-scale=1"/>
+                <link rel="stylesheet" href="/BOQ/static/src/css/site_config.css"/>
+            </head>
+
+            <body>
+                <div class="container">
+                    <!-- <h1>Site &amp; Configuration Selector</h1> -->
+                    <div class="logout-header">
+                        <h1 class="m-0">Site &amp; Configuration Selector</h1>
+                        <a href="/logout" class="logout-btn">Logout</a>
+                    </div>
+                    <!-- Site -->
+                    <label for="site_search">Site</label>
+                    <div class="autocomplete">
+                        <input id="site_search" type="text" placeholder="Type site id or name…"/>
+                        <input id="site_id" type="hidden"/>
+                        <div id="ac-list" class="ac-list"></div>
+                    </div>
+
+                    <!-- Config -->
+                    <label for="config_select">Config Version</label>
+                    <select id="config_select">
+                        <option value="">-- select --</option>
+                        <t t-foreach="config_versions" t-as="cfg">
+                            <option t-att-value="cfg.id" t-esc="cfg.config_versioned"/>
+                        </t>
+                    </select>
+
+                    <!-- Proceed button (above table) -->
+                    <button id="btn_proceed" class="btn">Proceed to create</button>
+                    <button id="btn_summary" class="btn btn-info ms-2">Config Level Summary</button>
+                    <button id="btn_site_level_summary" class="btn btn-info ms-2">Site Level Summary</button>
+                    <a href="/my/pending_sboqs" class="btn btn-primary save-button" style="text-decoration: none;">Pending Review</a>
+
+
+                    <!-- Lines card -->
+                    <div id="lines_placeholder" class="card d-none">
+                        <div class="card-header">Configuration Lines</div>
+                        <div class="card-body">
+                            <table id="lines_table">
+                                <thead>
+                                    <tr>
+                                        <th>Category</th>
+                                        <th>Customer Code</th>
+                                        <th>Supplier Code</th>
+                                        <th>Description</th>
+                                        <th>UoM</th>
+                                        <th>Cost Type</th>
+                                        <th>Qty</th>
+                                        <th>Unit Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="lines_tbody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <script src="/BOQ/static/src/js/site_config.js"></script>
+            </body>
+        </html>
+    </template>
+</odoo>

@@ -1,0 +1,91 @@
+.nav-tabs {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.nav-item {
+    margin-right: 10px;
+}
+
+.nav-link.active {
+    padding: 10px 20px;
+    cursor: pointer;
+    color: #0d0c0c;
+    background-color: #cfcfd7;
+    border-bottom: 2px solid #171313;
+    transition: background-color 0.3s;
+}
+
+.nav-link:hover {
+    background-color: #f0f0f0;
+}
+
+.nav-link {
+    background-color: #fff;
+    border-color: #ccc;
+    border-bottom: 2px solid #fff;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+
+
+.tab-pane {
+    display: none;
+}
+.tab-pane.active {
+    display: block;
+}
+
+
+
+
+/* ========== SAVE BUTTON Styling ========== */
+.save-button {
+    background-color: #007bff; /* Blue background */
+    color: white; /* White text */
+    margin-bottom: 40px;
+    border: none; /* No border */
+    padding: 10px 20px; /* Padding */
+    font-size: 14px; /* Font size */
+    border-radius: 4px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    transition: background-color 0.3s ease; /* Smooth background color transition */
+}
+
+.save-button:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+}
+
+/* Ensure button is aligned to the right in the action bar */
+.action-summary {
+    display: flex;
+    justify-content: space-between; /* Space between items */
+    align-items: center; /* Vertically center items */
+}
+
+.action-summary .totals {
+    margin-right: 20px; /* Space between totals and button */
+}
+.totals{
+    font-size: large;
+}
+
+/* ========== FILTER BAR Styling ========== */
+.filter-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.filter-bar input[type="text"] {
+    padding: 20px;
+    font-size: 14px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    flex: 1;
+}
+

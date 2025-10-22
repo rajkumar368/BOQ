@@ -1,0 +1,220 @@
+<odoo>
+    <template id="pending_review_detail_template" name="SBOQ Details">
+        <html>
+            <head>
+                <meta charset="utf-8"/>
+                <link rel="stylesheet" href="/BOQ/static/src/css/site_config.css"/>
+
+                <meta name="viewport" content="width=device-width, initial-scale=1"/>
+            </head>
+
+            <body>
+            <div class="container mt-4">
+
+                    <div class="logout-header d-flex justify-content-between align-items-center">
+                        <h1>SBOQ Details: <t t-esc="sboq.name"/></h1>
+                        <div class="d-flex">
+                            <a href="/my/pending_sboqs" class="btn btn-primary save-button" style="padding-top: 6px;padding-bottom: 7px;text-decoration: none;">Back to List</a>
+                            <a href="/site-config" class="btn btn-primary save-button" style="padding-top: 6px;padding-bottom: 7px;text-decoration: none;">Back to Home</a>
+                            <a href="/logout" class="btn btn-danger logout-btn ml-2">Logout</a>
+                        </div>
+                    </div>
+                    
+            <div id="portal_sboq_detail" class="oe_website_sale">
+                <t t-if="sboq.is_pending_review">
+                    <div class="card mb-3">
+                        <div class="card-header">Actions</div>
+                        <div class="card-body">
+                            <form id="sboq-action-form" method="post">
+                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()" />
+                                <!-- Input names aligned to match backend -->
+                                <input type="hidden" name="rejection_type" id="rejection_type_input" />
+                                <div class="form-group">
+                                    <!-- Will be sent as approval_note OR rejection_note based on action -->
+                                    <textarea id="note" class="form-control" placeholder="Enter a note (required for rejection only)" style="width: 50%; height: 100px;"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <button type="button" class="btn btn-success" onclick="submitSboqForm('approve')">Approve SBOQ</button>
+                                    <button type="button" class="btn btn-warning" onclick="submitSboqForm('reject', 'minor')">Reject - Minor</button>
+                                    <button type="button" class="btn btn-danger" onclick="submitSboqForm('reject', 'major')">Reject - Major</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <script>
+                        function submitSboqForm(action, rejectionType = null) {
+                            const form = document.getElementById('sboq-action-form');
+                            const noteElement = document.getElementById('note');
+                            const rejectionTypeInput = document.getElementById('rejection_type_input');
+                            const note = noteElement.value.trim();
+                            const sboqId = <t t-esc="sboq.id"/>;
+
+                            // Clean up any existing input fields with those names
+                            form.querySelectorAll('input[name="approval_note"], input[name="rejection_note"]').forEach(el => el.remove());
+
+                            if (action === 'approve') {
+                                // Set default note if empty
+                                const finalNote = note || 'OK Approved';
+                                // Create hidden input for approval_note
+                                const input = document.createElement('input');
+                                input.type = 'hidden';
+                                input.name = 'approval_note';
+                                input.value = finalNote;
+                                form.appendChild(input);
+
+                                form.action = `/my/sboq/${sboqId}/approve`;
+                                form.submit();
+
+                            } else if (action === 'reject') {
+                                if (!note) {
+                                    alert('Please enter a note for rejection.');
+                                    return;
+                                }
+                                if (!['minor', 'major'].includes(rejectionType)) {
+                                    alert('Invalid rejection type.');
+                                    return;
+                                }
+
+                                rejectionTypeInput.value = rejectionType;
+
+                                // Create hidden input for rejection_note
+                                const input = document.createElement('input');
+                                input.type = 'hidden';
+                                input.name = 'rejection_note';
+                                input.value = note;
+                                form.appendChild(input);
+
+                                form.action = `/my/sboq/${sboqId}/reject`;
+                                form.submit();
+                            }
+                        }
+                    </script>
+                </t>
+
+
+
+                <div class="card mb-3">
+                    <div class="card-header">SBOQ Information</div>
+                    <div class="card-body">
+                        <p><strong>SBOQ:</strong> <t t-esc="sboq.name"/></p>
+                        <p><strong>CBOQ:</strong> <t t-esc="sboq.cboq_id.name if sboq.cboq_id else 'N/A'"/></p>
+                        <p><strong>Site:</strong> <t t-esc="sboq.site_id.site_name"/></p>
+                        <p><strong>Total Amount:</strong> <t t-esc="sboq.total_amount"/></p>
+                        <p><strong>State:</strong> <t t-esc="sboq.state"/></p>
+                        <p><strong>Version:</strong> <t t-esc="sboq.version_label"/></p>
+                    </div>
+                </div>
+
+                <!-- SBOQ Lines -->
+                <div class="card mb-3">
+                    <div class="card-header">SBOQ Lines</div>
+                    <div class="card-body">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Source Type</th>
+                                    <th>Description</th>
+                                    <th>Cost Type</th>
+                                    <th>UoM</th>
+                                    <th>Quantity</th>
+                                    <th>Unit Price</th>
+                                    <th>Markup</th>
+                                    <th>Total Price</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="sboq.line_ids" t-as="line">
+                                    <tr>
+                                        <td><t t-esc="line.source_type"/></td>
+                                        <td><t t-esc="line.description"/></td>
+                                        <td><t t-esc="line.cost_type"/></td>
+                                        <td><t t-esc="line.uom"/></td>
+                                        <td><t t-esc="line.qty"/></td>
+                                        <td><t t-esc="line.unit_price"/></td>
+                                        <td><t t-esc="line.markup"/></td>
+                                        <td><t t-esc="line.total_price"/></td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <t t-if="cboq_options">
+                    <div class="card mb-3">
+                        <div class="card-header">Link to a different CBOQ</div>
+                        <div class="card-body">
+                            <form method="post" t-att-action="'/my/sboq/%s/link-cboq' % sboq.id">
+                                <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                                <div class="form-group" style="width: 300px;">
+                                    <label for="cboq_id">Select a CBOQ:</label>
+                                    <select name="cboq_id" id="cboq_id" class="form-control">
+                                        <t t-foreach="cboq_options" t-as="c">
+                                            <option t-att-value="c.id" t-att-selected="1 if c.id == cboq.id else None">
+                                                <t t-esc="c.name"/> - <t t-esc="c.status"/>
+                                            </option>
+                                        </t>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary mt-2">Link Selected CBOQ</button>
+                            </form>
+                        </div>
+                    </div>
+                </t>
+
+
+            <!-- Related CBOQ Details -->
+                <t t-if="cboq">
+                    <div class="card mb-3">
+                        <div class="card-header">Related CBOQ: <t t-esc="cboq.name"/></div>
+                        <div class="card-body">
+                            <p><strong>CBOQ #:</strong> <t t-esc="cboq.name"/></p>
+                            <p><strong>Config Version:</strong> <t t-esc="cboq.config_version_id.config_versioned"/></p>
+                            <p><strong>Status:</strong> <t t-esc="cboq.status"/></p>
+                            <p><strong>Total SOR:</strong> <t t-esc="cboq.total_sor"/></p>
+                            <p><strong>Total Config:</strong> <t t-esc="cboq.total_config"/></p>
+                            <h4>CBOQ Lines</h4>
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Source Type</th>
+                                        <th>Description</th>
+                                        <th>Cost Type</th>
+                                        <th>UoM</th>
+                                        <th>Quantity</th>
+                                        <th>Unit Price</th>
+                                        <th>Total Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <t t-foreach="cboq.line_ids" t-as="line">
+                                        <tr>
+                                            <td><t t-esc="line.source_type"/></td>
+                                            <td><t t-esc="line.description"/></td>
+                                            <td><t t-esc="line.cost_type"/></td>
+                                            <td><t t-esc="line.uom"/></td>
+                                            <td><t t-esc="line.qty"/></td>
+                                            <td><t t-esc="line.unit_price"/></td>
+                                            <td><t t-esc="line.total_price"/></td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </t>
+                <t t-else="">
+                    <div class="card mb-3">
+                        <div class="card-header">Related CBOQ</div>
+                        <div class="card-body">
+                            <p>No related CBOQ found for this site.</p>
+                        </div>
+                    </div>
+                </t>
+            </div>
+            </div>
+      </body>
+        </html>
+    </template>
+</odoo>

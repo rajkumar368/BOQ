@@ -1,0 +1,191 @@
+<odoo>
+    <template id="create_cboq_template" name="Create CBOQ">
+        <html>
+            <head>
+                <meta charset="utf-8" />
+                <meta name="viewport" content="width=device-width, initial-scale=1" />
+                <link rel="stylesheet" href="/BOQ/static/src/css/site_config.css"/>
+                <link rel="stylesheet" href="/BOQ/static/src/css/create_cboq.css" />
+            </head>
+
+            <body>
+
+                <!-- prevent any native form submission -->
+                <div class="container mt-4" onsubmit="return false;">
+                    <div class="logout-header">
+                        <h1 class="m-0">Create CBOQ</h1>
+                        <a href="/logout" class="logout-btn">Logout</a>
+                    </div>
+
+            <!-- Totals and Action Button -->
+                <div class="action-summary mb-3">
+                    <span class="totals">
+                        Total SOR: <strong id="total-sor-price">0.00</strong> |
+                        Total Config: <strong id="total-config-price">0.00</strong>
+                    </span>
+                    <div class="d-flex">
+                    <button id="btn-save-draft" type="button" class="btn btn-primary save-button ml-auto">
+                        Save Draft
+                    </button>
+                    <a href="/site-config" class="btn btn-primary save-button ml-auto" style="padding-top: 8px;text-decoration: none;">Back to Home</a>
+                    </div>
+                </div>
+
+                <!-- Filter & running totals -->
+                <div class="filter-bar">
+                    <input type="text" id="filter-category"
+                        class="form-control form-control-sm"
+                        placeholder="Filter Category…" />
+                    <input type="text" id="filter-description"
+                        class="form-control form-control-sm"
+                        placeholder="Filter Description…" />
+                </div>
+
+                    <!-- Hidden carriers -->
+                    <input type="hidden" id="site-id" t-att-value="site_id" />
+                    <input type="hidden" id="config-id" t-att-value="config_id" />
+                    <input type="hidden" id="is-main" t-att-value="is_main" />
+                    <input type="hidden" id="parent-id" t-att-value="parent_id or ''" />
+                    <!-- Tabs -->
+                    <!-- <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" data-target="#tab-sor">SOR Items</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" data-target="#tab-config">Config Lines</a>
+                        </li>
+                    </ul> -->
+                    <div class="nav nav-tabs">
+                        <div class="nav-item">
+                            <a class="nav-link active" data-target="#tab-sor">SOR Items</a>
+                        </div>
+                        <div class="nav-item">
+                            <a class="nav-link" data-target="#tab-config">Config Lines</a>
+                        </div>
+                    </div>
+
+                    <!-- Tab contents -->
+                    <div class="tab-content mt-3">
+                        <!-- SOR catalogue -->
+                        <div class="tab-pane active" id="tab-sor">
+                            <div class="table-wrapper">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Select</th>
+                                        <th>Category</th>
+                                        <th>Description</th>
+                                        <th>Cost Type</th>
+                                        <th>Qty</th>
+                                        <th>Unit Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="sor-tbody">
+                                    <t t-foreach="sor_items" t-as="item">
+                                        <tr class="sor-row" t-att-data-id="item.id">
+                                            <td>
+                                                <input type="checkbox" class="select-sor" t-att-checked="draft_data['sor_lines'] and any(line['item_id'] == item.id for line in draft_data['sor_lines'])" />
+                                                <!-- <input type="checkbox" class="select-sor" /> -->
+                                            </td>
+                                            <td>
+                                                <t t-esc="item.category" />
+                                            </td>
+                                            <td>
+                                                <t t-esc="item.description" />
+                                            </td>
+                                            <td>
+                                                <t t-esc="item.cost_type" />
+                                            </td>
+                                             <td>
+                                                <t t-set="matching_line" t-value="False"/>
+                                                <t t-foreach="draft_data['sor_lines']" t-as="line">
+                                                    <t t-if="line['item_id'] == item.id">
+                                                        <t t-set="matching_line" t-value="line"/>
+                                                    </t>
+                                                </t>
+                                                <input type="number" class="qty form-control form-control-sm" t-att-value="matching_line and matching_line['qty'] or 0" min="0" step="any"/>
+                                            </td>
+                                            <td>
+                                                <t t-set="matching_line" t-value="False"/>
+                                                <t t-foreach="draft_data['sor_lines']" t-as="line">
+                                                    <t t-if="line['item_id'] == item.id">
+                                                        <t t-set="matching_line" t-value="line"/>
+                                                    </t>
+                                                </t>
+                                                <input type="number" class="price form-control form-control-sm" t-att-value="matching_line and matching_line['unit_price'] or item.unit_price" step="any"/>
+                                            </td>
+
+                                            <!-- <td>
+                                                <input type="number"
+                                                    class="qty form-control form-control-sm"
+                                                    value="1" min="0" step="any" />
+                                            </td>
+                                            <td>
+                                                <input type="number"
+                                                    class="price form-control form-control-sm"
+                                                    t-att-value="item.unit_price" step="any" />
+                                            </td> -->
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                            </div>
+                        </div>
+
+                        <!-- Config lines -->
+                        <div class="tab-pane" id="tab-config">
+                            <div class="table-wrapper">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Category</th>
+                                        <th>Description</th>
+                                        <th>Cost Type</th>
+                                        <th>Qty</th>
+                                        <th>Unit Price</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="config-tbody">
+                                    <t t-foreach="config_items" t-as="l">
+                                        <tr class="config-row" t-att-data-id="l.id">
+                                            <td>
+                                                <t t-esc="l.category" />
+                                            </td>
+                                            <td>
+                                                <t t-esc="l.description" />
+                                            </td>
+                                            <td>
+                                                <t t-esc="l.cost_type" />
+                                            </td>
+                                            <td>
+                                                <t t-set="matching_line" t-value="False"/>
+                                                <t t-foreach="draft_data['config_lines']" t-as="line">
+                                                    <t t-if="line['config_line_id'] == l.id">
+                                                        <t t-set="matching_line" t-value="line"/>
+                                                    </t>
+                                                </t>
+                                                <input type="number" class="qty form-control form-control-sm" t-att-value="matching_line and matching_line['qty'] or l.qty" min="0" step="any"/>
+                                            </td>
+                                            <td>
+                                                <t t-set="matching_line" t-value="False"/>
+                                                <t t-foreach="draft_data['config_lines']" t-as="line">
+                                                    <t t-if="line['config_line_id'] == l.id">
+                                                        <t t-set="matching_line" t-value="line"/>
+                                                    </t>
+                                                </t>
+                                                <input type="number" class="price form-control form-control-sm" t-att-value="matching_line and matching_line['unit_price'] or l.unit_price" step="any"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </tbody>
+                            </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <script type="text/javascript" src="/BOQ/static/src/js/create_cboq.js" />
+            </body>
+        </html>
+    </template>
+</odoo>

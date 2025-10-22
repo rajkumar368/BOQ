@@ -1,0 +1,65 @@
+<odoo>
+    <template id="site_selection_template" name="Site Selector">
+        <html>
+            <head>
+                <title>Site Selector</title>
+                <meta charset="utf-8"/>
+                <meta name="viewport" content="width=device-width, initial-scale=1"/>
+                <link rel="stylesheet" href="/BOQ/static/src/css/site_config.css"/>
+            </head>
+
+            <body>
+                <div class="container">
+                    <div class="logout-header">
+                        <h1 class="m-0">Site Selector</h1>
+                        <a href="/sboq/logout" class="logout-btn">Logout</a>
+                    </div>
+
+                    <!-- Site -->
+                    <label for="site_search">Site</label>
+                    <div class="autocomplete">
+                        <input id="site_search" type="text" placeholder="Type site id or name…"/>
+                        <input id="site_id" type="hidden"/>
+                        <div id="ac-list" class="ac-list"></div>
+                    </div>
+
+                    <!-- <button id="sboq_btn_proceed" class="btn">Proceed to create</button> -->
+                    <!-- <button id="sboq_btn_summary" class="btn btn-info ms-2">Show Summary</button> -->
+
+                    <button id="sboq_btn_proceed" class="btn btn-primary">Proceed to create</button>
+                    <button id="sboq_btn_summary" class="btn btn-info ms-2">Show Summary</button>
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const proceedBtn = document.querySelector('#sboq_btn_proceed');
+                            const summaryBtn = document.querySelector('#sboq_btn_summary');
+                            const hiddenInput = document.querySelector('#site_id');
+                            if (!proceedBtn || !hiddenInput) {
+                                console.error('Button (#sboq_btn_proceed) or hidden input (#site_id) not found');
+                                return;
+                            }
+                            proceedBtn.addEventListener('click', () => {
+                                const siteId = hiddenInput.value;
+                                console.log('Proceed button clicked, siteId:', siteId);
+                                if (!siteId) {
+                                    alert('Please select a valid site.');
+                                    return;
+                                }
+                                window.location.href = '/sboq-create/' + parseInt(siteId);
+                            });
+                            summaryBtn.addEventListener('click', () => {
+                                const siteId = hiddenInput.value;
+                                if (!siteId) {
+                                    alert('Please select a valid site.');
+                                    return;
+                                }
+                                window.location.href = '/sboq-summary/' + parseInt(siteId);
+                            });
+                    });
+                </script>
+                
+                <script src="/BOQ/static/src/js/site_config.js"></script>
+            </div>
+            </body>
+        </html>
+    </template>
+</odoo>

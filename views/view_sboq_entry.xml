@@ -1,0 +1,232 @@
+<odoo>
+    <template id="create_sboq_template" name="Create SBOQ">
+        <html>
+            <head>
+                <meta charset="utf-8" />
+                <meta name="viewport" content="width=device-width, initial-scale=1" />
+                <link rel="stylesheet" href="/BOQ/static/src/css/site_config.css"/>
+                <link rel="stylesheet" href="/BOQ/static/src/css/create_cboq.css" />
+            </head>
+
+            <body>
+
+                <!-- prevent any native form submission -->
+                <div class="container mt-4" onsubmit="return false;">
+                    <div class="logout-header">
+                        <h1 class="m-0">Create SBOQ</h1>
+                        <a href="/sboq/logout" class="logout-btn">Logout</a>
+                    </div>
+
+                    <!-- Totals and Action Button -->
+                    <div class="action-summary mb-3">
+                        <span class="totals">
+                            Total SOR: <strong id="total-sor-price">0.00</strong> |
+                            Total Non SOR: <strong id="total-config-price">0.00</strong>
+                        </span>
+                        <div class="d-flex">
+                            <button id="btn-save-draft" type="button" class="btn btn-primary save-button ml-auto">Save</button>
+                            <input type="hidden" id="sboq_status-id" t-att-value="sboq_status" />
+                            <input type="hidden" id="sboq-id" t-att-value="sboq_id" />
+
+
+                            <!-- <form t-attf-action="/sboq-summary/submit/#{sboq_info['sboq'].id}" method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-primary" t-if="sboq_info['sboq'].state == 'rejected'">Resubmit TAF</button>
+                            </form> -->
+                            <a href="/sboq-site" class="btn btn-primary save-button ml-auto" style="padding-top: 8px;text-decoration: none;">Back to Home</a>
+                        </div>
+                    </div>
+
+                    <!-- Filter & running totals -->
+                    <div class="filter-bar">
+                        <input type="text" id="filter-category"
+                            class="form-control form-control-sm"
+                            placeholder="Filter Category…" />
+                        <input type="text" id="filter-description"
+                            class="form-control form-control-sm"
+                            placeholder="Filter Description…" />
+                    </div>
+
+                    <!-- Hidden carriers -->
+                    <input type="hidden" id="site-id" t-att-value="site_id" />
+                    <input type="hidden" id="is-main" t-att-value="is_main" />
+                    <input type="hidden" id="parent-id" t-att-value="parent_id or ''" />
+
+                    <!-- Tabs -->
+                    <div class="nav nav-tabs">
+                        <div class="nav-item">
+                            <a class="nav-link active" data-target="#tab-sor">SOR Items</a>
+                        </div>
+                        <div class="nav-item">
+                            <a class="nav-link" data-target="#tab-config">Non SOR Items</a>
+                        </div>
+                    </div>
+
+                    <!-- Tab contents -->
+                    <div class="tab-content mt-3">
+
+                        <!-- SOR catalogue -->
+                        <div class="tab-pane active" id="tab-sor">
+                            <div class="table-wrapper">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Select</th>
+                                            <th>Category</th>
+                                            <th>Description</th>
+                                            <th>Cost Type</th>
+                                            <th>Qty</th>
+                                            <th>Unit Price</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="sor-tbody">
+                                        <t t-foreach="sor_items" t-as="item">
+                                            <tr class="sor-row" t-att-data-id="item.id">
+                                                <td>
+                                                    <input type="checkbox" class="select-sor" t-att-checked="draft_data['sor_lines'] and any(line['item_id'] == item.id for line in draft_data['sor_lines'])" />
+                                                </td>
+                                                <td><t t-esc="item.category" /></td>
+                                                <td><t t-esc="item.description" /></td>
+                                                <td><t t-esc="item.cost_type" /></td>
+                                                <td>
+                                                    <t t-set="matching_line" t-value="False"/>
+                                                    <t t-foreach="draft_data['sor_lines']" t-as="line">
+                                                        <t t-if="line['item_id'] == item.id">
+                                                            <t t-set="matching_line" t-value="line"/>
+                                                        </t>
+                                                    </t>
+                                                    <input type="number" class="qty form-control form-control-sm" t-att-value="matching_line and matching_line['qty'] or 0" min="0" step="any"/>
+                                                </td>
+                                                <td>
+                                                    <t t-set="matching_line" t-value="False"/>
+                                                    <t t-foreach="draft_data['sor_lines']" t-as="line">
+                                                        <t t-if="line['item_id'] == item.id">
+                                                            <t t-set="matching_line" t-value="line"/>
+                                                        </t>
+                                                    </t>
+                                                    <input type="number" class="price form-control form-control-sm" t-att-value="matching_line and matching_line['unit_price'] or item.unit_price" step="any"/>
+                                                </td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Non SOR Items -->
+                        <div class="tab-pane" id="tab-config">
+
+                            <!-- Add Non-SOR Item button -->
+                            <div class="mb-2">
+                                <button id="add-nonsor" type="button" class="btn btn-success btn-sm">Add Non-SOR Item</button>
+                            </div>
+
+                            <div class="table-wrapper">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Category</th>
+                                            <th>Subcategory</th>
+                                            <th>Description</th>
+                                            <th>Qty</th>
+                                            <th>Unit Price</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="non_sor_tbody">
+                                        <t t-if="non_sor_items and len(non_sor_items) > 0">
+                                            <t t-foreach="non_sor_items" t-as="l">
+                                                <tr class="non-sor-row" t-att-data-id="l.id">
+                                                    <td>
+                                                        <select class="category-select form-control form-control-sm" t-att-value="l.category_id and l.category_id.id or ''">
+                                                            <option value="">Select Category</option>
+                                                            <t t-foreach="non_sor_categories" t-as="cat">
+                                                                <option t-att-value="cat.id" t-att-selected="l.category_id and cat.id == l.category_id.id"><t t-esc="cat.name"/></option>
+                                                            </t>
+                                                        </select>
+                                                    </td>
+                                                    <td>
+                                                        <select class="subcategory-select form-control form-control-sm">
+                                                            <option value="">Select Subcategory</option>
+                                                            <t t-if="l.category_id">
+                                                                <t t-foreach="non_sor_subcategories.filtered(lambda s: s.category_id.id == l.category_id.id)" t-as="subcat">
+                                                                    <option t-att-value="subcat.id" t-att-selected="l.subcategory_id and subcat.id == l.subcategory_id.id"><t t-esc="subcat.name"/></option>
+                                                                </t>
+                                                            </t>
+                                                        </select>
+                                                    </td>
+                                                    <td><input type="text" class="description-input form-control form-control-sm" t-att-value="l.description or ''" /></td>
+                                                    <td><input type="number" class="qty-input form-control form-control-sm" t-att-value="l.qty or 0" min="0" step="any" /></td>
+                                                    <td><input type="number" class="price-input form-control form-control-sm" t-att-value="l.unit_price or 0.00" min="0" step="any" /></td>
+                                                    <td>
+                                                        <button type="button" class="btn btn-danger btn-sm btn-remove" style="margin-top: 0px;">Remove</button>
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                        </t>
+                                        <t t-else="">
+                                            <!-- No items? Render one empty default row -->
+                                            <tr class="non-sor-row" data-id="">
+                                                <td>
+                                                    <select class="category-select form-control form-control-sm">
+                                                        <option value="">Select Category</option>
+                                                        <t t-foreach="non_sor_categories" t-as="cat">
+                                                            <option t-att-value="cat.id"><t t-esc="cat.name"/></option>
+                                                        </t>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <select class="subcategory-select form-control form-control-sm">
+                                                        <option value="">Select Subcategory</option>
+                                                        <!-- filled dynamically by JS -->
+                                                    </select>
+                                                </td>
+                                                <td><input type="text" class="description-input form-control form-control-sm" /></td>
+                                                <td><input type="number" class="qty-input form-control form-control-sm" value="0" min="0" step="any" /></td>
+                                                <td><input type="number" class="price-input form-control form-control-sm" value="0.00" min="0" step="any" /></td>
+                                                <td><button type="button" class="btn btn-danger btn-sm btn-remove" style="margin-top: 0px;" >Remove</button></td>
+                                            </tr>
+                                        </t>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Template for new Non-SOR item row -->
+                <template id="non_sor_row_template">
+                    <tr class="non-sor-row" data-id="">
+                        <td>
+                            <select class="category-select form-control form-control-sm">
+                                <option value="">Select Category</option>
+                                <t t-foreach="non_sor_categories" t-as="cat">
+                                    <option t-att-value="cat.id"><t t-esc="cat.name"/></option>
+                                </t>
+                            </select>
+                        </td>
+                        <td>
+                            <select class="subcategory-select form-control form-control-sm">
+                                <option value="">Select Subcategory</option>
+                                <!-- filled dynamically by JS -->
+                            </select>
+                        </td>
+                        <td><input type="text" class="description-input form-control form-control-sm" /></td>
+                        <td><input type="number" class="qty-input form-control form-control-sm" value="0" min="0" step="any" /></td>
+                        <td><input type="number" class="price-input form-control form-control-sm" value="0.00" min="0" step="any" /></td>
+                        <td><button type="button" class="btn btn-danger btn-sm btn-remove" style="margin-top: 0px;">Remove</button></td>
+                    </tr>
+                </template>
+
+                <!-- Pass subcategories data as JSON for JS usage -->
+                 <script type="application/json" id="non_sor_categories_data">
+                    <t t-raw="json.dumps([{ 'id': str(c.id), 'name': c.name } for c in non_sor_categories])"/>
+                </script>
+                <script type="application/json" id="non_sor_subcategories_data">
+                    <t t-raw="json.dumps([{ 'id': str(s.id), 'name': s.name, 'category_id': str(s.category_id.id) } for s in non_sor_subcategories])"/>
+                </script>
+
+                <script type="text/javascript" src="/BOQ/static/src/js/create_sboq.js"></script>
+            </body>
+        </html>
+    </template>
+</odoo>

@@ -1,0 +1,85 @@
+<odoo>
+    <template id="pending_review" name="Pending SBOQ Reviews">
+
+        <html>
+            <head>
+                <meta charset="utf-8" />
+                <link rel="stylesheet" href="/BOQ/static/src/css/site_config.css"/>
+
+                <meta name="viewport" content="width=device-width, initial-scale=1" />
+            </head>
+
+            <body>
+                <div class="container mt-4">
+
+                    <div class="logout-header d-flex justify-content-between align-items-center">
+                        <h1 class="m-0">Pending SBOQ Reviews</h1>
+                        <div class="d-flex">
+                            <a href="/site-config" class="btn btn-primary save-button" style="padding-top: 6px;padding-bottom: 7px;text-decoration: none;">Back to Home</a>
+                            <a href="/logout" class="btn btn-danger logout-btn ml-2">Logout</a>
+                        </div>
+                    </div>
+                    
+                <div id="portal_pending_sboqs" class="oe_website_sale">
+                    <!-- <h1>Pending SBOQ Reviews</h1> -->
+                    <t t-if="sboqs">
+                        <table class="table table-sm o_portal_table">
+                            <thead>
+                                <tr>
+                                    <th>SBOQ Name</th>
+                                    <th>CBOQ Name</th>
+                                    <th>Site Name</th>
+                                    <th>Total CBOQ Amount</th>
+                                    <th>Total SBOQ Amount</th>
+                                    <th>Submitted By</th>
+                                    <th>SBOQ Submitted Date</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="sboqs" t-as="sboq">
+                                    <tr>
+                                        <td>
+                                            <a t-attf-href="/my/sboq/#{sboq.id}">
+                                                <t t-esc="sboq.name" />
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <t t-esc="sboq.cboq_id.name" />
+                                        </td>
+                                        <td>
+                                            <t t-esc="sboq.site_id.site_name" />
+                                        </td>
+                                        <td>
+                                            <t t-esc="round(sboq.cboq_id.total_amount, 2)" />
+                                        </td>
+                                        <td>
+                                            <t t-esc="round(sboq.total_amount, 2)" />
+                                        </td>
+                                        <td>
+                                            <t t-esc="sboq.create_uid.login" />
+                                        </td>
+                                        <td>
+                                            <t t-esc="sboq.create_date"
+                                                t-options="{'widget': 'date'}" />
+                                        </td>
+                                        <td>
+                                            <a t-attf-href="/my/sboq/#{sboq.id}" class="btn btn-primary btn-sm">Details</a>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+                        <t t-if="pagination and pagination.get('page_count', 0) > 1">
+                            <t t-call="portal.pager" t-att-pager="pagination" />
+                        </t>
+                    </t>
+                    <t t-else="">
+                        <p>No pending reviews.</p>
+                    </t>
+                </div>
+                </div>
+            </body>
+        </html>
+    </template>
+</odoo>

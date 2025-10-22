@@ -1,0 +1,73 @@
+/* Full-page background setup */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: url('/BOQ/static/src/img/login-bg.jpg') no-repeat center center fixed;
+    background-size: cover;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+/* Container styles */
+.boq-login-container {
+    background-color: rgba(255, 255, 255, 0.95);
+    padding: 40px 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+}
+
+/* Heading */
+.boq-login-container h2 {
+    margin-bottom: 30px;
+    font-size: 26px;
+    color: #2c3e50;
+    letter-spacing: 1px;
+}
+
+/* Form input fields */
+.boq-login-container input[type="text"],
+.boq-login-container input[type="password"] {
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s ease;
+}
+
+.boq-login-container input:focus {
+    border-color: #3498db;
+    outline: none;
+}
+
+/* Login button */
+.boq-login-container button {
+    width: 100%;
+    padding: 12px;
+    background-color: #3498db;
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.boq-login-container button:hover {
+    background-color: #2980b9;
+}
+
+/* Error message */
+.login-error {
+    color: #e74c3c;
+    font-size: 14px;
+    margin-top: 15px;
+}

@@ -1,0 +1,15 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_vendor_employee,boq.vendor.employee,model_boq_vendor,base.group_user,1,1,1,1
+access_master_employee,boq.master.employee,model_boq_master,base.group_user,1,1,1,1
+access_sitelist_employee,boq.sitelist.employee,model_boq_sitelist,base.group_user,1,1,1,1
+access_cboq_employee,cboq.employee,model_cboq,base.group_user,1,1,1,1
+access_config_version_employee,cboq.config.version.employee,model_cboq_config_version,base.group_user,1,1,1,1
+access_config_line_employee,cboq.config.line.employee,model_cboq_config_line,base.group_user,1,1,1,1
+access_cboq_sor_employee,cboq.sor.employee,model_cboq_sor,base.group_user,1,1,1,1
+access_cboq_line_employee,cboq.line.employee,model_cboq_line,base.group_user,1,1,1,1
+access_sboq_employee,sboq.employee,model_sboq,base.group_user,1,1,1,1
+access_sboq_sor_employee,sboq.sor.employee,model_sboq_sor,base.group_user,1,1,1,1
+access_non_sor_employee,sboq.non.sor.employee,model_sboq_non_sor,base.group_user,1,1,1,1
+access_sboq_line_employee,sboq.line.employee,model_sboq_line,base.group_user,1,1,1,1
+access_category_employee,sboq.category.employee,model_sboq_category,base.group_user,1,1,1,1
+access_subcategory_employee,sboq.subcategory.employee,model_sboq_subcategory,base.group_user,1,1,1,1

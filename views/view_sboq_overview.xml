@@ -1,0 +1,133 @@
+<odoo>
+    <template id="sboq_summary_template" name="SBOQ Summary">
+        <html>
+            <head>
+                <link rel="stylesheet" href="/BOQ/static/src/css/site_config.css"/>
+            </head>
+            <body>
+                
+                <div class="container mt-4">
+                     <div class="logout-header d-flex justify-content-between align-items-center">
+                        <h1 class="m-0">SBOQ Summary for Site <t t-esc="site.site_name"/></h1>
+                        <div class="d-flex">
+                            <a href="/sboq-site" class="btn btn-primary save-button" style="padding-top: 6px;padding-bottom: 7px;text-decoration: none;">Back to Home</a>
+                            <a href="/sboq/logout" class="btn btn-danger logout-btn ml-2">Logout</a>
+                        </div>
+                    </div>
+
+                    <t t-foreach="sboq_data" t-as="sboq_info">
+                        <div class="card mb-4">
+                            <!-- header with toggle button -->
+                            <div class="card-header" t-attf-id="heading-#{sboq_info['sboq'].id}">
+                                <h5 class="mb-0">
+                                    <button class="btn btn-link"
+                                            t-attf-onclick="toggleCard('collapse-#{sboq_info['sboq'].id}')">
+                                        <strong>SBOQ #</strong>: <t t-esc="sboq_info['sboq'].name"/> |
+                                        <strong>Version</strong>: <t t-esc="sboq_info['sboq'].version_label"/> |
+                                        <strong>Status</strong>: <t t-esc="sboq_info['sboq'].state"/> |
+                                        <strong>Total Amount</strong>: <t t-esc="round(sboq_info['sboq'].total_amount, 2)"/>
+                                    </button>
+                                </h5>
+                            </div>
+
+                            <!-- collapsible body -->
+                            <div t-attf-id="collapse-#{sboq_info['sboq'].id}"
+                                 class="card-body"
+                                 style="display:none">
+                                <t t-if="sboq_info['sboq'].state == 'rejected'">
+                                    <div class="alert alert-warning">
+                                        <p><strong>Rejected Type:</strong> <t t-esc="sboq_info['sboq'].rejection_type or 'Unknown'"/></p>
+                                        <p><strong>Reason:</strong> <t t-esc="sboq_info['sboq'].rejection_note or 'Not specified'"/></p>
+                                        <p><strong>Rejected By:</strong> <t t-esc="sboq_info['sboq'].reviewed_by_id.login or 'Unknown'"/></p>
+                                        <p><strong>Rejection Date:</strong> <t t-esc="sboq_info['sboq'].reviewed_date and sboq_info['sboq'].reviewed_date.strftime('%d/%m/%Y %H:%M:%S') or 'Not specified'"/></p>
+                                    </div>
+                                </t>
+                                <!-- action buttons -->
+                                <div class="card-footer">
+                                    <form t-attf-action="/sboq-summary/delete/#{sboq_info['sboq'].id}" method="post" style="display:inline;">
+                                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to delete this draft?');" t-if="sboq_info['sboq'].state == 'draft'">Delete Draft</button>
+                                    </form>
+                                    <form t-attf-action="/sboq-summary/submit/#{sboq_info['sboq'].id}" method="post" style="display:inline;">
+                                        <button type="submit" class="btn btn-primary" t-if="sboq_info['sboq'].state == 'draft'">Submit SBOQ</button>
+                                    </form>
+                                    <!-- <form t-attf-action="/sboq-summary/resubmitted/#{sboq_info['sboq'].id}" method="post" style="display:inline;">
+                                        <button type="submit" class="btn btn-primary" t-if="sboq_info['sboq'].state == 'rejected'">Resubmit SBOQ</button>
+                                    </form> -->
+
+                                    <!-- Back to Editor if state is draft -->
+                                    <a t-attf-href="/sboq-create/#{sboq_info['sboq'].site_id.id}?status=draft&amp;sboq_id=#{sboq_info['sboq'].id}&amp;rejection_type=NA"
+                                    class="btn btn-secondary"
+                                    t-if="sboq_info['sboq'].state == 'draft'">
+                                    Back to Editor
+                                    </a>
+
+                                    <!-- If rejected and rejection_type is major, show 'Create New Version' -->
+                                    <a t-attf-href="/sboq-create/#{sboq_info['sboq'].site_id.id}?status=rejected&amp;sboq_id=#{sboq_info['sboq'].id}&amp;rejection_type=major"
+                                    class="btn btn-danger"
+                                    t-if="sboq_info['sboq'].state == 'rejected' and sboq_info['sboq'].rejection_type == 'major' and not sboq_info['sboq'].is_resubmitted">
+                                    Create New Version
+                                    </a>
+
+                                    <!-- If rejected and rejection_type is minor, show 'Create New Variation' -->
+                                    <a t-attf-href="/sboq-create/#{sboq_info['sboq'].site_id.id}?status=rejected&amp;sboq_id=#{sboq_info['sboq'].id}&amp;rejection_type=minor"
+                                    class="btn btn-warning"
+                                    t-if="sboq_info['sboq'].state == 'rejected' and sboq_info['sboq'].rejection_type == 'minor' and not sboq_info['sboq'].is_resubmitted">
+                                    Create New Variation
+                                    </a>
+
+                                    <a t-attf-href="/sboq-create/#{sboq_info['sboq'].site_id.id}?status=approved&amp;sboq_id=#{sboq_info['sboq'].id}&amp;rejection_type=NA"
+                                    class="btn btn-warning"
+                                    t-if="sboq_info['sboq'].state == 'approved' and not sboq_info['sboq'].is_resubmitted">
+                                    Create New Variation
+                                    </a>
+
+                                    <!-- <a t-attf-href="/sboq-create/#{sboq_info['sboq'].site_id.id}?status=#{sboq_info['sboq'].state}" class="btn btn-secondary" t-if="sboq_info['sboq'].state not in ['submitted','resubmitted', 'approved']">Back to Editor</a> -->
+                                    <a t-attf-href="/sboq-summary/export/#{sboq_info['sboq'].id}" class="btn btn-secondary" t-if="sboq_info['sboq'].state == 'approved'">Export SBOQ</a>
+
+                                    <!-- <a t-attf-href="/sboq-create/#{sboq_info['sboq'].site_id.id}" class="btn btn-secondary" t-if="sboq_info['sboq'].state == 'draft'">Back to Editor</a> -->
+                                    <!-- <a t-attf-href="/sboq-summary/export/#{sboq_info['sboq'].id}" class="btn btn-secondary" t-if="sboq_info['sboq'].state != 'draft'">Export TAF</a> -->
+                                </div>
+
+                                <!-- full line list -->
+                                <h4>Full Lines</h4>
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Type</th>
+                                            <th>Description</th>
+                                            <th>Cost Type</th>
+                                            <th>Qty</th>
+                                            <th>Unit Price</th>
+                                            <th>Markup</th>
+                                            <th>Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr t-foreach="sboq_info['sboq'].line_ids" t-as="line">
+                                            <td t-esc="dict(line._fields['source_type'].selection).get(line.source_type)"/>
+                                            <td t-esc="line.description"/>
+                                            <td t-esc="line.cost_type"/>
+                                            <td t-esc="line.qty"/>
+                                            <td t-esc="round(line.unit_price, 2)"/>
+                                            <td t-esc="round(line.markup, 2)"/>
+                                            <td t-esc="round(line.total_price, 2)"/>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </t>
+                </div>
+
+                <!-- toggle script -->
+                <script>
+                function toggleCard(id) {
+                    const el = document.getElementById(id);
+                    if (!el) { console.error('Card not found:', id); return; }
+                    el.style.display = (el.style.display === 'none') ? 'block' : 'none';
+                }
+                </script>
+            </body>
+        </html>
+    </template>
+</odoo>
